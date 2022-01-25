@@ -21,7 +21,7 @@
 # TODO (begin) #
 #######################
 # Change 'youruniqname' to match your UM uniqname (no quote marks).
-UNIQNAME    = youruniqname
+UNIQNAME    = lsaxe
 
 # Change the right hand side of the identifier to match the project identifier
 # given in the project or lab specification.
@@ -296,6 +296,8 @@ help:
 # % g++ -std=c++1z -MM *.cpp
 #
 # ADD YOUR OWN DEPENDENCIES HERE
+
+hunt: main.cpp functions.cpp functions.h
 
 ######################
 # TODO (end) #
