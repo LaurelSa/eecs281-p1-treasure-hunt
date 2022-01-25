@@ -51,17 +51,21 @@ public:
     // Read and process command line arguments.
     void get_options(int argc, char** argv);
 
-    // captain hunt
+    // captain search
     void cap_search();
 
-    //first mate hunt
-    void fm_search();
+    //first mate search, returns true if $found
+    bool fm_search(Location landLoc);
+
+    // captain hunt returns T if $found (calls fm_search when land is hit)
+    bool cap_hunt();
+
+    // fm hunt, breaks when treasure is found
+    void fm_hunt();
     
     // Sort and print the data.
     void run();
 
-    void hunt(char, deque<Location> &, Location);
-    
     
 private:
 

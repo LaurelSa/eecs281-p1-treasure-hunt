@@ -66,75 +66,114 @@ void TreasureHunt::create_map(){
 }//create_map
 
 
-
-// Runs through the search order and adds any valid lcoations to the container
-// valid with both captain and first mate, only ever need to push in this function
-// locType: 'o' for captain | '.' for fm
-// container: search container for cap or mate
-// cur: sailLocation (if captain) | searchLocation (if fm)
-void TreasureHunt::hunt(char locType, deque<Location> &container, Location cur){
+bool TreasureHunt::cap_hunt(){
+    bool foundT = false;
     for(int i = 0; i < 4; ++i){
         char curD = huntOrder[i];
         Location newLoc;
-        
+
+        // check what direction to search
         if(curD == 'N'){
-            newLoc = north(cur, map);
-            if(newLoc.type == locType){ // if the location type looking for and newLoc type match, add to container
+            newLoc = north(cap.sailLocation, map); // call appropriate location grabber function
+            // check that the newLoc is land
+            if(newLoc.type == 'o'){ 
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'N'; // add the direction travelled to find the location
-                container.push_back(newLoc);
-            }//if
-            // if types don't match and we are in captain hunt but discovered land, launch a fm search
-            else if(newLoc.type != locType && locType == 'o' && newLoc.type == '.'){
-                fm_search();
-            }//else if
-        }//if N
+                cap.search.push_back(newLoc); // add the location to the captain deque
+            }
+            // check if the newLoc is land or treasure and hand the search off to the firstmate
+            else if(newLoc.type == '.' || newLoc.type == '$'){foundT = fm_search(newLoc);}
+        }
 
-        if(curD =='S'){
-            newLoc = south(cur, map);
-            if(newLoc.type == locType){
-                map[newLoc.x][newLoc.y].dis = true;
-                map[newLoc.x][newLoc.y].dirT = 'S';
-                container.push_back(newLoc);
-            }//if
-            else if(newLoc.type != locType && locType == 'o' && newLoc.type == '.'){
-                fm_search();
-            }//else if
-        }//if S
+        else if(curD == 'S'){
+            newLoc = south(cap.sailLocation, map);
+            if(newLoc.type == 'o'){
+                map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
+                map[newLoc.x][newLoc.y].dirT = 'S'; // add the direction travelled to find the location
+                cap.search.push_back(newLoc);
+            }
+            else if(newLoc.type == '.' || newLoc.type == '$'){foundT = fm_search(newLoc);}
+        }
 
-        if(curD == 'E'){
-            newLoc = east(cur, map);
-            if(newLoc.type == locType){
-                map[newLoc.x][newLoc.y].dis = true;
-                map[newLoc.x][newLoc.y].dirT = 'E';
-                container.push_back(newLoc);
-            }//if
-            else if(newLoc.type != locType && locType == 'o' && newLoc.type == '.'){
-                fm_search();
-            }//else if
-        }//if E
+        else if(curD == 'E'){
+            newLoc = east(cap.sailLocation, map);
+            if(newLoc.type == 'o'){
+                map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
+                map[newLoc.x][newLoc.y].dirT = 'E'; // add the direction travelled to find the location
+                cap.search.push_back(newLoc);
+            }
+            else if(newLoc.type == '.' || newLoc.type == '$'){foundT = fm_search(newLoc);}
+        }
 
-        if(curD == 'W'){
-            newLoc = west(cur, map);
-            if(newLoc.type == locType){
-                map[newLoc.x][newLoc.y].dis = true; 
-                map[newLoc.x][newLoc.y].dirT = 'W';
-                container.push_back(newLoc);
-            }//if
-            else if(newLoc.type != locType && locType == 'o' && newLoc.type == '.'){
-                fm_search();
-            }//else if
-        }//if W
-    }//for
+        else if(curD == 'W'){
+            newLoc = west(cap.sailLocation, map);
+            if(newLoc.type == 'o'){
+                map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
+                map[newLoc.x][newLoc.y].dirT = 'W'; // add the direction travelled to find the location
+                cap.search.push_back(newLoc);
+            }
+            else if(newLoc.type == '.' || newLoc.type == '$'){foundT = fm_search(newLoc);}
+        }
+    }
+    return foundT;
 }
 
 
+void TreasureHunt::fm_hunt(){
+    for(int i = 0; i < 4; ++i){
+        char curD = huntOrder[i];
+        Location newLoc;
+
+        // check what direction to search
+        if(curD == 'N'){
+            newLoc = north(mate.searchLocation, map); // call appropriate location grabber function
+            // check that the newLoc is water or treasure
+            if(newLoc.type == '.' || newLoc.type == '$'){ 
+                map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
+                map[newLoc.x][newLoc.y].dirT = 'N'; // add the direction travelled to find the location
+                mate.search.push_back(newLoc); // add the location to the first mate dequq
+            }
+        }
+
+        else if(curD == 'S'){
+            newLoc = south(mate.searchLocation, map);
+            if(newLoc.type == '.' || newLoc.type == '$'){
+                map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
+                map[newLoc.x][newLoc.y].dirT = 'S'; // add the direction travelled to find the location
+                mate.search.push_back(newLoc);
+            }
+        }
+
+        else if(curD == 'E'){
+            newLoc = east(mate.searchLocation, map);
+            if(newLoc.type == '.' || newLoc.type == '$'){
+                map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
+                map[newLoc.x][newLoc.y].dirT = 'E'; // add the direction travelled to find the location
+                mate.search.push_back(newLoc);
+            }
+        }
+
+        else if(curD == 'W'){
+            newLoc = west(mate.searchLocation, map);
+            if(newLoc.type == '.' || newLoc.type == '$'){
+                map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
+                map[newLoc.x][newLoc.y].dirT = 'W'; // add the direction travelled to find the location
+                mate.search.push_back(newLoc);
+            }//if
+        }//else if
+    }
+}
+
+
+
 void TreasureHunt::cap_search(){
+    bool foundT = false;
     // add start locaiton to deque
+    startLoc.dis = true;
     cap.search.push_back(startLoc);
 
     // while container not empty
-    while(!cap.search.empty()){
+    while(!cap.search.empty() && !foundT){
         // set sailLocation to next location
         // if captain is a queue use front and pop front
         if(captain== "QUEUE"){
@@ -147,28 +186,40 @@ void TreasureHunt::cap_search(){
             cap.search.pop_back();
         }
         // follow hunt order to add new locations
-        hunt('o', cap.search, cap.sailLocation);
+        foundT = cap_hunt();
     }
     // hunt ended, report outcome
-
-
-
 }
 
-void TreasureHunt::fm_search(){
-    //cap.search.
+bool TreasureHunt::fm_search(Location landLoc){
+    bool foundT = false;
+    mate.search.push_back(landLoc);
 
-    // queue funcitonality for FM
-    if(firstMate == "QUEUE"){
+    //check if container is empty
+    while(!mate.search.empty() && !foundT){
 
-    }  
+        if(firstMate == "QUEUE"){
+            if(mate.search.front().type == '$'){
+                foundT = true;
+                break;
+            }//if
+            mate.searchLocation = mate.search.front();
+            mate.search.pop_front();
+        }//if
 
-    // stack functionality for FM
-    else{
+        else if(firstMate == "STACK"){
+            //check if back is treasure
+            if(mate.search.back().type == '$'){
+                foundT = true;
+                break;
+            }//if
+            mate.searchLocation = mate.search.back();
+            mate.search.pop_back();
+        }//else if
 
-    }
-
-
-
+        fm_hunt();
+        
+    }//while
+    return foundT;
 }
 
