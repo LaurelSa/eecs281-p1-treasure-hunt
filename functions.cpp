@@ -15,59 +15,65 @@ using namespace std;
 void TreasureHunt::create_map(){
     int mapSize;
     char mapT; 
-    char next;
+    //char next;
     string line;
+
+    //check for comment on the first line
     while(cin.peek()== '#'){
-        getline(cin, line);
-    }
+        getline(cin, line); //read the comment into junk
+    }//while
+
+    //read in the mapType and mapSize
     cin >> mapT >> mapSize;
 
-    Location loc;
+    //Location loc;
 
-    //vector< vector<Location> > map(mapSize, vector<Location>(mapSize, loc));
+    // resize TreasureHunt::map based on size
     map.resize(mapSize, vector<Location>(mapSize));
     
-
+    // reading in map in grid form
     if(mapT == 'M'){
+        // initialize variable for location struct
         char let;
         int row = 0;
         int col = 0;
+        // read in all the char in map grid
         while(cin >> let){
-            Location loc;
+            Location loc; // create and modify a location
             loc.type = let;
             loc.x = row;
             loc.y = col;
-            if(let == '@'){startLoc = loc;}
-            map[row][col] = loc;
+        
+            if(let == '@'){startLoc = loc;} // set start location
+            map[row][col] = loc; // add location to map
 
-
-            if(col < mapSize){++col;}
-            else if(col >= mapSize){col = 0; ++row;}
+            if(col < mapSize){++col;} // incriment col until reaching end of a row
+            else if(col >= mapSize){col = 0; ++row;} // reset column and change to new row
         } //while
     } // if M
 
-
+    //reading in map in coordinate form
     if(mapT == 'L'){
         char let;
         int row = 0;
         int col = 0;
+        // read in coordinates and symbols
         while(cin >> row >> col >> let){
-            Location loc;
+            Location loc; //create new location
             loc.type = let;
             loc.x = row;
             loc.y = col;
+            if(let == '@'){startLoc = loc;} // set start location
 
-            if(let == '@'){startLoc = loc;}
-
-            map[row][col] = loc;
+            map[row][col] = loc; // add location to map
         }//while
     }//if L
-   
 }//create_map
 
 
 bool TreasureHunt::cap_hunt(){
-    bool foundT = false;
+    bool foundT = false; // variable to track if treasure is found
+
     for(int i = 0; i < 4; ++i){
         char curD = huntOrder[i];
         Location newLoc;
@@ -80,10 +86,15 @@ bool TreasureHunt::cap_hunt(){
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'N'; // add the direction travelled to find the location
                 cap.search.push_back(newLoc); // add the location to the captain deque
-            }
+            }//if
             // check if the newLoc is land or treasure and hand the search off to the firstmate
-            else if(newLoc.type == '.' || newLoc.type == '$'){foundT = fm_search(newLoc);}
-        }
+            else if(newLoc.type == '.' || newLoc.type == '$'){
+                foundT = fm_search(newLoc);
+                newLoc.dirT = foundT; // in the hitLand vector dirT says if treasure was found by fm
+                hitLand.push_back(newLoc);
+                ++numAshore;
+            }//else if
+        }//if N
 
         else if(curD == 'S'){
             newLoc = south(cap.sailLocation, map);
@@ -91,9 +102,14 @@ bool TreasureHunt::cap_hunt(){
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'S'; // add the direction travelled to find the location
                 cap.search.push_back(newLoc);
-            }
-            else if(newLoc.type == '.' || newLoc.type == '$'){foundT = fm_search(newLoc);}
-        }
+            }//if
+            else if(newLoc.type == '.' || newLoc.type == '$'){
+               foundT = fm_search(newLoc);
+                newLoc.dirT = foundT; // in the hitLand vector dirT says if treasure was found by fm
+                hitLand.push_back(newLoc);
+                ++numAshore;
+            }//else if
+        }//else if S
 
         else if(curD == 'E'){
             newLoc = east(cap.sailLocation, map);
@@ -101,9 +117,14 @@ bool TreasureHunt::cap_hunt(){
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'E'; // add the direction travelled to find the location
                 cap.search.push_back(newLoc);
-            }
-            else if(newLoc.type == '.' || newLoc.type == '$'){foundT = fm_search(newLoc);}
-        }
+            }//if
+            else if(newLoc.type == '.' || newLoc.type == '$'){
+                foundT = fm_search(newLoc);
+                newLoc.dirT = foundT; // in the hitLand vector dirT says if treasure was found by fm
+                hitLand.push_back(newLoc);
+                ++numAshore;
+            }//else if
+        }//else if E
 
         else if(curD == 'W'){
             newLoc = west(cap.sailLocation, map);
@@ -111,9 +132,14 @@ bool TreasureHunt::cap_hunt(){
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'W'; // add the direction travelled to find the location
                 cap.search.push_back(newLoc);
-            }
-            else if(newLoc.type == '.' || newLoc.type == '$'){foundT = fm_search(newLoc);}
-        }
+            }//if
+            else if(newLoc.type == '.' || newLoc.type == '$'){
+                foundT = fm_search(newLoc);
+                newLoc.dirT = foundT; // in the hitLand vector dirT says if treasure was found by fm
+                hitLand.push_back(newLoc);
+                ++numAshore;
+            }//else if
+        }//else if W
     }
     return foundT;
 }
@@ -179,11 +205,13 @@ void TreasureHunt::cap_search(){
         if(captain== "QUEUE"){
             cap.sailLocation = cap.search.front();
             cap.search.pop_front();
+            ++numWaterI;
         }
         //if captain is a stack use back and pop back
         else if(captain == "STACK"){
             cap.sailLocation = cap.search.back();
             cap.search.pop_back();
+            ++numWaterI;
         }
         // follow hunt order to add new locations
         foundT = cap_hunt();
@@ -201,20 +229,24 @@ bool TreasureHunt::fm_search(Location landLoc){
         if(firstMate == "QUEUE"){
             if(mate.search.front().type == '$'){
                 foundT = true;
+                treasureLoc = mate.search.front();
                 break;
             }//if
             mate.searchLocation = mate.search.front();
             mate.search.pop_front();
+            ++numLandI;
         }//if
 
         else if(firstMate == "STACK"){
             //check if back is treasure
             if(mate.search.back().type == '$'){
+                treasureLoc = mate.search.back();
                 foundT = true;
                 break;
             }//if
             mate.searchLocation = mate.search.back();
             mate.search.pop_back();
+            ++numLandI;
         }//else if
 
         fm_hunt();
@@ -223,3 +255,55 @@ bool TreasureHunt::fm_search(Location landLoc){
     return foundT;
 }
 
+Back opposite_direction(char direction, Location loc){
+    Back prevLoc;
+    if(direction == 'N'){
+        //backwards is south
+        prevLoc.r = loc.x - 1;
+        prevLoc.c = loc.y;
+        prevLoc.nextDir = 'S';
+    }
+    else if(direction == 'S'){
+        //backwards is N
+        prevLoc.r = loc.x + 1;
+        prevLoc.c = loc.y;
+        prevLoc.nextDir = 'N';
+    }
+    else if(direction == 'E'){
+        //backwards is  W
+        prevLoc.r = loc.x;
+        prevLoc.c = loc.y - 1;
+        prevLoc.nextDir = 'W';
+    }
+    else if(direction == 'W'){
+        //backwards is E
+        prevLoc.r = loc.x;
+        prevLoc.c = loc.y + 1;
+        prevLoc.nextDir = 'E';
+    }
+    return prevLoc;
+}
+
+void TreasureHunt::backtrace(){
+    int row = treasureLoc.x;
+    int col = treasureLoc.y;
+    char disDirection = treasureLoc.dirT;
+    
+
+    Location cur = treasureLoc;
+
+    while(cur.x != startLoc.x && cur.y != startLoc.y){
+        Back nextDirection = opposite_direction(disDirection, cur);
+        Location next = map[nextDirection.r][nextDirection.c];
+        // we have our current Loc and next Loc
+        if((cur.dirT == 'N' || cur.dirT == 'S') &&(next.dirT == 'N' || next.dirT == 'S')){
+            
+        }
+    }
+
+
+}
+
+void report(){
+
+}

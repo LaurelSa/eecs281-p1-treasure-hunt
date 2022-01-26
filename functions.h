@@ -16,15 +16,21 @@ struct Location{
     bool dis = false; // true if discovered, false if not
 };
 
+struct Back{
+    int r = 0;
+    int c = 0;
+    char nextDir = 'I';
+};
+
 struct Captain{
-    deque<Location> search;
+    std::deque<Location> search;
 
     Location sailLocation;
 
 };
 
 struct FirstMate{
-    deque<Location> search;
+    std::deque<Location> search;
 
     Location searchLocation;
 };
@@ -62,9 +68,14 @@ public:
 
     // fm hunt, breaks when treasure is found
     void fm_hunt();
+
+    //calls the functions for verbose, stats, and show path
+    void report();
     
     // Sort and print the data.
     void run();
+
+    void backtrace();
 
     
 private:
@@ -73,33 +84,42 @@ private:
     std::vector<std::vector<Location>> map;
     
     // first mate container
-    string firstMate = "";
+    std::string firstMate = "";
     FirstMate mate;
 
     // captain container type
-    string captain = "";
+    std::string captain = "";
     Captain cap;
 
     // Order of hunt type
-    string huntOrder;
+    std::string huntOrder;
     
     // made true for verbose and stats output
     bool vbose = false;
     bool stats = false;
 
     // contains M or L for output map
-    string showP = "";
+    std::string showP = "";
 
     Location startLoc;
 
     Location treasureLoc;
+
+    int numLandI = 0;
+    int numWaterI = 0;
+    int numAshore = 0;
+
+    // in the hitLand vector dirT says if treasure was found by fm
+    std::vector<Location> hitLand;
+
+    int pathLength = 0;
 };
 
 // functions to get the location that is N|S|E|W
 // these return based on a location not being discovered and it being a valid map location
 // other function takes care of chekcing land or water
-Location north(Location &current,vector<vector<Location>> &map);
-Location south(Location &current,vector<vector<Location>> &map);
-Location east(Location &current,vector<vector<Location>> &map);
-Location west(Location &current,vector<vector<Location>> &map);
+Location north(Location &current,std::vector<std::vector<Location>> &map);
+Location south(Location &current,std::vector<std::vector<Location>> &map);
+Location east(Location &current,std::vector<std::vector<Location>> &map);
+Location west(Location &current,std::vector<std::vector<Location>> &map);
 

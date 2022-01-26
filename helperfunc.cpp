@@ -29,7 +29,8 @@ Location south(Location &current,vector<vector<Location>> &map){
     //row +1
     Location tempLoc;
     tempLoc.type = '#';
-    if(current.x != map.size()){
+    size_t locX = current.x;
+    if(locX != map.size()){
         int tempR = current.x +1;
         Location validLoc = map[tempR][current.y];
         validLoc.dirT = 'S';
@@ -42,7 +43,8 @@ Location east(Location &current,vector<vector<Location>> &map){
     //col +1
     Location tempLoc;
     tempLoc.type = '#'; // initialize it as invalid
-    if(current.y != map.size()){
+    size_t locY = current.y;
+    if(locY != map.size()){
         int tempC = current.y +1;
         Location validLoc = map[current.x][tempC];
         validLoc.dirT = 'E';
