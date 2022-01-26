@@ -30,7 +30,7 @@ Location south(Location &current,vector<vector<Location>> &map){
     Location tempLoc;
     tempLoc.type = '#';
     size_t locX = current.x;
-    if(locX != map.size()){
+    if(locX != map.size() - 1){
         int tempR = current.x +1;
         Location validLoc = map[tempR][current.y];
         validLoc.dirT = 'S';
@@ -44,7 +44,7 @@ Location east(Location &current,vector<vector<Location>> &map){
     Location tempLoc;
     tempLoc.type = '#'; // initialize it as invalid
     size_t locY = current.y;
-    if(locY != map.size()){
+    if(locY != map.size() - 1){
         int tempC = current.y +1;
         Location validLoc = map[current.x][tempC];
         validLoc.dirT = 'E';

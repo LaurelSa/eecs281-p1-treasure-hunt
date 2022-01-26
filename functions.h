@@ -11,7 +11,7 @@
 struct Location{
     int x = 0;
     int y = 0;
-    char type; // land, water, start, or treasure
+    char type = 'I'; // land, water, start, or treasure
     char dirT; // direction travelled to get to this spot
     bool dis = false; // true if discovered, false if not
 };
@@ -71,6 +71,10 @@ public:
 
     //calls the functions for verbose, stats, and show path
     void report();
+    void print_verbose(Location hitLand, bool found);
+    void print_show_pathM();
+    void print_show_pathL();
+    void print_stats();
     
     // Sort and print the data.
     void run();
@@ -84,22 +88,22 @@ private:
     std::vector<std::vector<Location>> map;
     
     // first mate container
-    std::string firstMate = "";
+    std::string firstMate = "QUEUE";
     FirstMate mate;
 
     // captain container type
-    std::string captain = "";
+    std::string captain = "STACK";
     Captain cap;
 
     // Order of hunt type
-    std::string huntOrder;
+    std::string huntOrder = "NESW";
     
     // made true for verbose and stats output
     bool vbose = false;
     bool stats = false;
 
     // contains M or L for output map
-    std::string showP = "";
+    char showP = 'X';
 
     Location startLoc;
 
@@ -113,6 +117,9 @@ private:
     std::vector<Location> hitLand;
 
     int pathLength = 0;
+
+    //contains the path, need to popfront for printing
+    std::deque<Location> Path;
 };
 
 // functions to get the location that is N|S|E|W

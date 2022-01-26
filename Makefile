@@ -297,7 +297,9 @@ help:
 #
 # ADD YOUR OWN DEPENDENCIES HERE
 
-hunt: main.cpp functions.cpp functions.h helperfunc.cpp
+functions.o: functions.cpp functions.h
+helperfunc.o: helperfunc.cpp functions.h
+main.o: main.cpp functions.h
 
 ######################
 # TODO (end) #

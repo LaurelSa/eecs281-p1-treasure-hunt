@@ -19,8 +19,27 @@ int main(int argc, char ** argv){
 
     myHunt.get_options(argc, argv);
 
+    myHunt.create_map();
+
+    myHunt.cap_search();
+
+    myHunt.report();
+
+
+
 }//main
 
+void print_help(){
+    cout << "This program searches for treasure from a file\n"
+         << "Usage: \'./hunt\n\t [--captain | -c] <STACK | QUEUE>\n"
+         <<                 "\t[--first-mate | -f] <STACK | QUEUE>\n"
+         <<                 "\t[--hunt-order | -o] <string inlcuding N, E, S, W>\n"
+         <<                 "\t[--verbose | -v]\n" 
+         <<                 "\t[--stats | -s]\n" 
+         <<                 "\t[--show-path| -p] <M | L>\n" 
+         <<                 "\t[--help | -h]\n" 
+         <<endl;
+}
 
 
 void TreasureHunt::get_options(int argc, char** argv){
@@ -43,18 +62,50 @@ void TreasureHunt::get_options(int argc, char** argv){
     while((option = getopt_long(argc, argv, "hc:f:o:vsp:", long_options, &option_index)) != -1){
         switch(option){
         case 'h':
-            //TODO
+            print_help();
+            exit(0);
             break;
         case 'c':
             captain = optarg;
+            if(optarg == nullptr){
+                captain = "STACK";
+            }
+            else if(captain != "STACK" && captain != "QUEUE"){
+                cerr << "Invalid argument to --captain" << endl;  // personal debug
+                exit(1);
+            }
             break;
         
         case 'f':
             firstMate = optarg;
+            if(optarg == nullptr){
+                firstMate = "QUEUE";
+            }
+            else if(firstMate != "STACK" && firstMate != "QUEUE"){
+                cerr << "Invalid argument to --first-mate" << endl;  // personal debug
+                exit(1);
+            }
             break;
         
         case 'o':
-            huntOrder = std::string(optarg);
+            huntOrder = optarg;
+            if(optarg == nullptr){
+                huntOrder = "NESW";
+            }
+            else if(huntOrder.length() != 4){
+                cerr << "Invalid argument to --hunt-order" << endl;  // personal debug
+                exit(1);
+            }
+            else{
+                long int numN = count(huntOrder.begin(), huntOrder.end(), 'N');
+                long int numS = count(huntOrder.begin(), huntOrder.end(), 'S');
+                long int numE = count(huntOrder.begin(), huntOrder.end(), 'E');
+                long int numW = count(huntOrder.begin(), huntOrder.end(), 'W');
+                if(numN > 1 || numS > 1 || numE > 1 || numW >1){
+                    cerr << "Invalid argument to --hunt-order" << endl;  // personal debug
+                    exit(1);
+                }
+            }
             break;
 
         case 'v':
@@ -66,15 +117,24 @@ void TreasureHunt::get_options(int argc, char** argv){
             break;
 
         case 'p':
-            showP = optarg;
+            if(showP == 'M' || showP == 'L'){
+                cerr << "Specify --show-path only once" << endl;  // personal debug
+                exit(1);
+            }
+            showP = *optarg;
+            if(showP != 'M' && showP != 'L'){
+                //cout << showP;
+                cerr << "Invalid argument to --show-path" << endl;  // personal debug
+                
+                exit(1);
+            }
             break;
 
         default:
-            huntOrder = "NESW";
-            captain = "STACK";
-            firstMate = "QUEUE";
-        
+            cerr << "Unknown option" << endl;  // personal debug
+                exit(1);
         }//switch
+
     }//while
 
     /*if(!something){
