@@ -1,6 +1,6 @@
+// PROJECT IDENTIFIER: 40FB54C86566B9DDEAB902CC80E8CE85C1C62AAD
 #include <getopt.h>
 #include <iostream>
-#include <iomanip>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -67,7 +67,7 @@ public:
     bool cap_hunt();
 
     // fm hunt, breaks when treasure is found
-    void fm_hunt();
+    bool fm_hunt();
 
     //calls the functions for verbose, stats, and show path
     void report();

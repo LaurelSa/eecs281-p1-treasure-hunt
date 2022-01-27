@@ -1,7 +1,7 @@
+// PROJECT IDENTIFIER: 40FB54C86566B9DDEAB902CC80E8CE85C1C62AAD
 #include "functions.h"
 #include <getopt.h>
 #include <iostream>
-#include <iomanip>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -89,6 +89,9 @@ bool TreasureHunt::cap_hunt(){
             }//if
             // check if the newLoc is land or treasure and hand the search off to the firstmate
             else if(newLoc.type == 'o' || newLoc.type == '$'){
+                newLoc.dirT = 'N';
+                newLoc.dis = true;
+                map[newLoc.x][newLoc.y] = newLoc;
                 foundT = fm_search(newLoc);
                 newLoc.dirT = foundT; // in the hitLand vector dirT says if treasure was found by fm
                 if(vbose){print_verbose(newLoc, foundT);}
@@ -104,8 +107,11 @@ bool TreasureHunt::cap_hunt(){
                 cap.search.push_back(newLoc);
             }//if
             else if(newLoc.type == 'o' || newLoc.type == '$'){
-               foundT = fm_search(newLoc);
-                newLoc.dirT = foundT; // in the hitLand vector dirT says if treasure was found by fm
+                newLoc.dirT = 'S';
+                newLoc.dis = true;
+                map[newLoc.x][newLoc.y] = newLoc;
+                foundT = fm_search(newLoc);
+                newLoc.dirT = foundT; // in the hitLand vector dirT says if treasure was found by fm DELETE?
                 if(vbose){print_verbose(newLoc, foundT);}
                 ++numAshore;
             }//else if
@@ -119,6 +125,9 @@ bool TreasureHunt::cap_hunt(){
                 cap.search.push_back(newLoc);
             }//if
             else if(newLoc.type == 'o' || newLoc.type == '$'){
+                newLoc.dirT = 'E';
+                newLoc.dis = true;
+                map[newLoc.x][newLoc.y] = newLoc;
                 foundT = fm_search(newLoc);
                 newLoc.dirT = foundT; // in the hitLand vector dirT says if treasure was found by fm
                 if(vbose){print_verbose(newLoc, foundT);}
@@ -134,6 +143,9 @@ bool TreasureHunt::cap_hunt(){
                 cap.search.push_back(newLoc);
             }//if
             else if(newLoc.type == 'o' || newLoc.type == '$'){
+                newLoc.dirT = 'W';
+                newLoc.dis = true;
+                map[newLoc.x][newLoc.y] = newLoc;
                 foundT = fm_search(newLoc);
                 newLoc.dirT = foundT; // in the hitLand vector dirT says if treasure was found by fm
                 if(vbose){print_verbose(newLoc, foundT);}
@@ -145,7 +157,8 @@ bool TreasureHunt::cap_hunt(){
 }
 
 
-void TreasureHunt::fm_hunt(){
+bool TreasureHunt::fm_hunt(){
+    bool found = false;
     for(int i = 0; i < 4; ++i){
         char curD = huntOrder[i];
         Location newLoc;
@@ -158,6 +171,7 @@ void TreasureHunt::fm_hunt(){
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'N'; // add the direction travelled to find the location
                 mate.search.push_back(newLoc); // add the location to the first mate dequq
+                if(newLoc.type == '$'){ found = true;}
             }
         }
 
@@ -167,6 +181,7 @@ void TreasureHunt::fm_hunt(){
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'S'; // add the direction travelled to find the location
                 mate.search.push_back(newLoc);
+                if(newLoc.type == '$'){ found = true;}
             }
         }
 
@@ -176,6 +191,7 @@ void TreasureHunt::fm_hunt(){
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'E'; // add the direction travelled to find the location
                 mate.search.push_back(newLoc);
+                if(newLoc.type == '$'){ found = true;}
             }
         }
 
@@ -185,9 +201,11 @@ void TreasureHunt::fm_hunt(){
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'W'; // add the direction travelled to find the location
                 mate.search.push_back(newLoc);
+                if(newLoc.type == '$'){ found = true;}
             }//if
         }//else if
     }
+    return found;
 }
 
 
@@ -224,12 +242,13 @@ void TreasureHunt::cap_search(){
 }
 
 bool TreasureHunt::fm_search(Location landLoc){
-    if(vbose){cout << "Searching island... ";}
+    //if(vbose){cout << "Searching island... ";}
     bool foundT = false;
+    bool tInHunt = false;
     mate.search.push_back(landLoc);
 
     //check if container is empty
-    while(!mate.search.empty() && !foundT){
+    while(!mate.search.empty() && !foundT && !tInHunt){
 
         if(firstMate == "QUEUE"){
             if(mate.search.front().type == '$'){
@@ -254,7 +273,12 @@ bool TreasureHunt::fm_search(Location landLoc){
             ++numLandI;
         }//else if
 
-        fm_hunt();
+        tInHunt = fm_hunt();
+        if(tInHunt){
+            ++numLandI;
+            foundT = true;
+            treasureLoc = mate.search.back();
+        }
         
     }//while
     return foundT;
@@ -264,13 +288,13 @@ Back opposite_direction(char direction, Location loc){
     Back prevLoc;
     if(direction == 'N'){
         //backwards is south
-        prevLoc.r = loc.x - 1;
+        prevLoc.r = loc.x + 1;
         prevLoc.c = loc.y;
         prevLoc.nextDir = 'S';
     }
     else if(direction == 'S'){
         //backwards is N
-        prevLoc.r = loc.x + 1;
+        prevLoc.r = loc.x - 1;
         prevLoc.c = loc.y;
         prevLoc.nextDir = 'N';
     }
@@ -293,10 +317,11 @@ void TreasureHunt::backtrace(){
     
     Location cur = treasureLoc;
     treasureLoc.type = 'X';
+    //map[treasureLoc.x][treasureLoc.y].type = 'X';
     Path.push_front(cur);
     
 
-    while(cur.x != startLoc.x && cur.y != startLoc.y){
+    while(!(cur.x == startLoc.x && cur.y == startLoc.y)){
         Back nextDirection = opposite_direction(cur.dirT, cur);
         Location next = map[nextDirection.r][nextDirection.c];
         Path.push_front(next);
@@ -323,19 +348,20 @@ void TreasureHunt::backtrace(){
 
 void TreasureHunt::report(){
     //verbose called during search
-
+    backtrace();
     if(stats){
         //call print_stats
+        //backtrace();
         print_stats();
     }
 
-    if(showP == 'M' && treasureLoc.type == '$'){
-        backtrace();
+    if(showP == 'M' && treasureLoc.type == 'X'){
+        //backtrace();
         print_show_pathM();
     }
 
-    if(showP == 'L' && treasureLoc.type == '$'){
-        backtrace();
+    if(showP == 'L' && treasureLoc.type == 'X'){
+        //backtrace();
         print_show_pathM();
     }
 
@@ -360,7 +386,7 @@ void TreasureHunt::print_stats(){
     cout << "Land locations investigated: " << numLandI << endl;
     cout << "Went ashore: " << numAshore << endl;
 
-    if(treasureLoc.type == '$'){
+    if(treasureLoc.type == 'X'){
         cout << "Path length: " << pathLength << endl;
         cout << "Treasure location: " << treasureLoc.x << "," << treasureLoc.y <<endl;
     }
@@ -383,6 +409,7 @@ void TreasureHunt::print_verbose(Location hitLand, bool found){
 }
 
 void TreasureHunt::print_show_pathM(){
+    map[treasureLoc.x][treasureLoc.y].type = 'X';
     for(size_t r = 0; r < map.size(); ++r){
         for(size_t c = 0; c < map.size(); ++c){
             cout << map[r][c].type;
