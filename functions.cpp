@@ -19,7 +19,7 @@ void TreasureHunt::create_map(){
     string line;
 
     //check for comment on the first line
-    while(cin.peek()== '#'){
+    while(cin.peek() == '#'){
         getline(cin, line); //read the comment into junk
     }//while
 
@@ -57,6 +57,7 @@ void TreasureHunt::create_map(){
         char let;
         int row = 0;
         int col = 0;
+        int numElts = 0;
         // read in coordinates and symbols
         while(cin >> row >> col >> let){
             Location loc; //create new location
@@ -66,7 +67,19 @@ void TreasureHunt::create_map(){
             if(let == '@'){startLoc = loc;} // set start location
 
             map[row][col] = loc; // add location to map
+            ++numElts;
         }//while
+        if(numElts < mapSize*mapSize){
+        for(int r = 0; r < mapSize; ++r){
+            for(int c = 0; c < mapSize; ++c){
+                if(map[r][c].type == 'I'){
+                    map[r][c].type = '.';
+                    map[r][c].x = r;
+                    map[r][c].y = c;
+                }//if
+            }//for
+        }//for
+        }//if
     }//if L
 }//create_map
 
@@ -171,7 +184,7 @@ bool TreasureHunt::fm_hunt(){
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'N'; // add the direction travelled to find the location
                 mate.search.push_back(newLoc); // add the location to the first mate dequq
-                if(newLoc.type == '$'){ found = true;}
+                if(newLoc.type == '$'){ return true;}
             }
         }
 
@@ -181,7 +194,7 @@ bool TreasureHunt::fm_hunt(){
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'S'; // add the direction travelled to find the location
                 mate.search.push_back(newLoc);
-                if(newLoc.type == '$'){ found = true;}
+                if(newLoc.type == '$'){ return true;}
             }
         }
 
@@ -191,7 +204,7 @@ bool TreasureHunt::fm_hunt(){
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'E'; // add the direction travelled to find the location
                 mate.search.push_back(newLoc);
-                if(newLoc.type == '$'){ found = true;}
+                if(newLoc.type == '$'){ return true;}
             }
         }
 
@@ -201,7 +214,7 @@ bool TreasureHunt::fm_hunt(){
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'W'; // add the direction travelled to find the location
                 mate.search.push_back(newLoc);
-                if(newLoc.type == '$'){ found = true;}
+                if(newLoc.type == '$'){ return true;}
             }//if
         }//else if
     }
@@ -247,15 +260,22 @@ bool TreasureHunt::fm_search(Location landLoc){
     bool tInHunt = false;
     mate.search.push_back(landLoc);
 
+    if(landLoc.type == '$'){
+        ++numLandI;
+        foundT = true;
+        treasureLoc = mate.search.back();
+    }
+
     //check if container is empty
     while(!mate.search.empty() && !foundT && !tInHunt){
 
         if(firstMate == "QUEUE"){
-            if(mate.search.front().type == '$'){
+            /*if(tInHunt){
+                ++numLandI;
                 foundT = true;
                 treasureLoc = mate.search.front();
                 break;
-            }//if
+            }//if*/
             mate.searchLocation = mate.search.front();
             mate.search.pop_front();
             ++numLandI;
@@ -263,11 +283,11 @@ bool TreasureHunt::fm_search(Location landLoc){
 
         else if(firstMate == "STACK"){
             //check if back is treasure
-            if(mate.search.back().type == '$'){
+            /*if(tInHunt){
                 treasureLoc = mate.search.back();
                 foundT = true;
                 break;
-            }//if
+            }//if*/
             mate.searchLocation = mate.search.back();
             mate.search.pop_back();
             ++numLandI;
@@ -314,9 +334,9 @@ Back opposite_direction(char direction, Location loc){
 }
 
 void TreasureHunt::backtrace(){
-    
+    if(treasureLoc.type == '$'){treasureLoc.type = 'X';}
     Location cur = treasureLoc;
-    treasureLoc.type = 'X';
+    
     //map[treasureLoc.x][treasureLoc.y].type = 'X';
     Path.push_front(cur);
     
@@ -342,7 +362,7 @@ void TreasureHunt::backtrace(){
         cur = next;
         ++pathLength;
     }
-    Path.push_front(startLoc);
+    //Path.push_front(startLoc);
 
 }
 
@@ -362,7 +382,7 @@ void TreasureHunt::report(){
 
     if(showP == 'L' && treasureLoc.type == 'X'){
         //backtrace();
-        print_show_pathM();
+        print_show_pathL();
     }
 
     if(treasureLoc.type == '$' || treasureLoc.type == 'X'){
@@ -370,7 +390,7 @@ void TreasureHunt::report(){
         cout << " with path length " << pathLength << "." << endl;
     }
     if(treasureLoc.type != '$' && treasureLoc.type != 'X'){
-        cout << "No treasure found after invesigating " << numLandI+numWaterI;
+        cout << "No treasure found after investigating " << numLandI+numWaterI; //fixed
         cout << " locations." << endl;
         
     }
@@ -426,7 +446,7 @@ void TreasureHunt::print_show_pathL(){
        Path.pop_front();
     }
     cout << "Search:" << endl;
-    while(Path.front().type == '.' || Path.front().type == 'X'){
+    while(Path.front().type == 'o' || Path.front().type == 'X'){
        cout << Path.front().x << "," << Path.front().y <<endl;
        Path.pop_front();
     }

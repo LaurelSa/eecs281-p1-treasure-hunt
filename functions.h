@@ -35,10 +35,6 @@ struct FirstMate{
     Location searchLocation;
 };
 
-struct Verbose{
-
-};
-
 struct Stats{
     int numWater = 0;
     int numLand = 0;
@@ -75,9 +71,6 @@ public:
     void print_show_pathM();
     void print_show_pathL();
     void print_stats();
-    
-    // Sort and print the data.
-    void run();
 
     void backtrace();
 
@@ -125,8 +118,8 @@ private:
 // functions to get the location that is N|S|E|W
 // these return based on a location not being discovered and it being a valid map location
 // other function takes care of chekcing land or water
-Location north(Location &current,std::vector<std::vector<Location>> &map);
-Location south(Location &current,std::vector<std::vector<Location>> &map);
-Location east(Location &current,std::vector<std::vector<Location>> &map);
-Location west(Location &current,std::vector<std::vector<Location>> &map);
+Location north(Location &current, std::vector<std::vector<Location>> &map);
+Location south(Location &current, std::vector<std::vector<Location>> &map);
+Location east(Location &current, std::vector<std::vector<Location>> &map);
+Location west(Location &current, std::vector<std::vector<Location>> &map);
 

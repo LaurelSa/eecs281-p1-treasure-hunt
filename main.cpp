@@ -142,8 +142,3 @@ void TreasureHunt::get_options(int argc, char** argv){
 
 }//getMode
 
-
-void TreasureHunt::run(){
-    // put the functions that do command line stuff
-}
-
