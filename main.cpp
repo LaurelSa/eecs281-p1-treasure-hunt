@@ -23,6 +23,7 @@ int main(int argc, char ** argv){
     myHunt.cap_search();
 
     myHunt.report();
+    
     return 0;
 }//main
 
@@ -114,7 +115,7 @@ void TreasureHunt::get_options(int argc, char** argv){
             break;
 
         case 'p':
-            if(showP == "M" || showP == "L"){
+            if(showP  == "M" || showP == "L"){
                 cerr << "Specify --show-path only once" << '\n';  // personal debug
                 exit(1);
             }

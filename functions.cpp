@@ -11,7 +11,7 @@
 
 using namespace std;
 
-
+////////////////////////////////// CREATE_MAP //////////////////////////////////
 void TreasureHunt::create_map(){
     int mapSize;
     char mapT; 
@@ -25,8 +25,6 @@ void TreasureHunt::create_map(){
 
     //read in the mapType and mapSize
     cin >> mapT >> mapSize;
-
-    //Location loc;
 
     // resize TreasureHunt::map based on size
     map.resize(mapSize, vector<Location>(mapSize));
@@ -57,7 +55,6 @@ void TreasureHunt::create_map(){
         char let;
         int row = 0;
         int col = 0;
-        //int numElts = 0;
         // read in coordinates and symbols
         while(cin >> row >> col >> let){
             Location loc; //create new location
@@ -69,22 +66,45 @@ void TreasureHunt::create_map(){
             map[row][col] = loc; // add location to map
             //++numElts;
         }//while
-        /*if(numElts < mapSize*mapSize){
-        for(int r = 0; r < mapSize; ++r){
-            for(int c = 0; c < mapSize; ++c){
-                if(map[r][c].type == 'I'){
-                    map[r][c].type = '.';
-                    map[r][c].x = r;
-                    map[r][c].y = c;
-                }//if
-            }//for
-        }//for
-        }//if*/
     }//if L
 }//create_map
 
+///////////////////////////////////// CAP_SEARCH ////////////////////////////////
+void TreasureHunt::cap_search(){
+    if(vbose){cout << "Treasure hunt started at: " << startLoc.x << "," << startLoc.y <<'\n';}
+    bool foundT = false;
+    // add start locaiton to deque
+    startLoc.dis = true;
+    cap.search.push_back(startLoc);
 
-bool TreasureHunt::cap_hunt(std::deque<Location> &search, std::deque<Location> &searchMate){
+    // while container not empty
+    while(!cap.search.empty() && !foundT){
+        // set sailLocation to next location
+        // if captain is a queue use front and pop front
+        if(captain== "QUEUE"){
+            cap.sailLocation = cap.search.front();
+            cap.search.pop_front();
+            ++numWaterI;
+        }
+        //if captain is a stack use back and pop back
+        else if(captain == "STACK"){
+            cap.sailLocation = cap.search.back();
+            cap.search.pop_back();
+            ++numWaterI;
+        }
+        // follow hunt order to add new locations
+        foundT = cap_hunt();
+    }
+    // hunt ended, report outcome
+    if(vbose){
+        if(treasureLoc.type != '$'){cout << "Treasure hunt failed" <<'\n';}
+    }
+}
+////////////////////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////// CAP_HUNT ///////////////////////////////////////////
+bool TreasureHunt::cap_hunt(){
     bool foundT = false; // variable to track if treasure is found
 
     for(int i = 0; i < 4; ++i){
@@ -93,84 +113,124 @@ bool TreasureHunt::cap_hunt(std::deque<Location> &search, std::deque<Location> &
 
         // check what direction to search
         if(curD == 'N'){
-            newLoc = north(sailLocation, map); // call appropriate location grabber function
+            newLoc = north(cap.sailLocation.x, cap.sailLocation.y, map); // call appropriate location grabber function
             // check that the newLoc is land
             if(newLoc.type == '.'){ 
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'N'; // add the direction travelled to find the location
-                search.push_back(newLoc); // add the location to the captain deque
+                cap.search.push_back(newLoc); // add the location to the captain deque
             }//if
             // check if the newLoc is land or treasure and hand the search off to the firstmate
             else if(newLoc.type == 'o' || newLoc.type == '$'){
                 newLoc.dirT = 'N';
                 newLoc.dis = true;
                 map[newLoc.x][newLoc.y] = newLoc;
-                foundT = fm_search(newLoc, searchMate);
+                foundT = fm_search(newLoc);
                 newLoc.dirT = foundT; // in the hitLand vector dirT says if treasure was found by fm
-                if(vbose){print_verbose(newLoc, foundT);}
+                if(vbose){print_verbose(newLoc.x, newLoc.y, foundT);}
                 ++numAshore;
             }//else if
         }//if N
 
         else if(curD == 'S'){
-            newLoc = south(sailLocation, map);
+            newLoc = south(cap.sailLocation.x, cap.sailLocation.y, map);
             if(newLoc.type == '.'){
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'S'; // add the direction travelled to find the location
-                search.push_back(newLoc);
+                cap.search.push_back(newLoc);
             }//if
             else if(newLoc.type == 'o' || newLoc.type == '$'){
                 newLoc.dirT = 'S';
                 newLoc.dis = true;
                 map[newLoc.x][newLoc.y] = newLoc;
-                foundT = fm_search(newLoc, searchMate);
+                foundT = fm_search(newLoc);
                 newLoc.dirT = foundT; // in the hitLand vector dirT says if treasure was found by fm DELETE?
-                if(vbose){print_verbose(newLoc, foundT);}
+                if(vbose){print_verbose(newLoc.x, newLoc.y, foundT);}
                 ++numAshore;
             }//else if
         }//else if S
 
         else if(curD == 'E'){
-            newLoc = east(sailLocation, map);
+            newLoc = east(cap.sailLocation.x, cap.sailLocation.y, map);
             if(newLoc.type == '.'){
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'E'; // add the direction travelled to find the location
-                search.push_back(newLoc);
+                cap.search.push_back(newLoc);
             }//if
             else if(newLoc.type == 'o' || newLoc.type == '$'){
                 newLoc.dirT = 'E';
                 newLoc.dis = true;
                 map[newLoc.x][newLoc.y] = newLoc;
-                foundT = fm_search(newLoc, searchMate);
+                foundT = fm_search(newLoc);
                 newLoc.dirT = foundT; // in the hitLand vector dirT says if treasure was found by fm
-                if(vbose){print_verbose(newLoc, foundT);}
+                if(vbose){print_verbose(newLoc.x, newLoc.y, foundT);}
                 ++numAshore;
             }//else if
         }//else if E
 
         else if(curD == 'W'){
-            newLoc = west(sailLocation, map);
+            newLoc = west(cap.sailLocation.x, cap.sailLocation.y, map);
             if(newLoc.type == '.'){
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'W'; // add the direction travelled to find the location
-                search.push_back(newLoc);
+                cap.search.push_back(newLoc);
             }//if
             else if(newLoc.type == 'o' || newLoc.type == '$'){
                 newLoc.dirT = 'W';
                 newLoc.dis = true;
                 map[newLoc.x][newLoc.y] = newLoc;
-                foundT = fm_search(newLoc, searchMate);
+                foundT = fm_search(newLoc);
                 newLoc.dirT = foundT; // in the hitLand vector dirT says if treasure was found by fm
-                if(vbose){print_verbose(newLoc, foundT);}
+                if(vbose){print_verbose(newLoc.x, newLoc.y, foundT);}
                 ++numAshore;
             }//else if
         }//else if W
     }
     return foundT;
 }
+/////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////// FM_SEARCH ////////////////////////////////////////
+bool TreasureHunt::fm_search(const Location &landLoc){
+    bool foundT = false;
+    bool tInHunt = false;
+    mate.search.push_back(landLoc);
 
-bool TreasureHunt::fm_hunt(std::deque<Location> &search){
+    if(landLoc.type == '$'){
+        ++numLandI;
+        foundT = true;
+        treasureLoc = mate.search.back();
+    }
+
+    //check if container is empty
+    while(!mate.search.empty() && !foundT && !tInHunt){
+
+        if(firstMate == "QUEUE"){
+            mate.searchLocation = mate.search.front();
+            mate.search.pop_front();
+            ++numLandI;
+        }//if
+
+        else if(firstMate == "STACK"){
+            mate.searchLocation = mate.search.back();
+            mate.search.pop_back();
+            ++numLandI;
+        }//else if
+
+        tInHunt = fm_hunt();
+        if(tInHunt){
+            ++numLandI;
+            foundT = true;
+            treasureLoc = mate.search.back();
+        }
+        
+    }//while
+    return foundT;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////// FM_HUNT /////////////////////////////////////////////////////
+bool TreasureHunt::fm_hunt(){
     bool found = false;
     for(int i = 0; i < 4; ++i){
         char curD = huntOrder[i];
@@ -178,166 +238,86 @@ bool TreasureHunt::fm_hunt(std::deque<Location> &search){
 
         // check what direction to search
         if(curD == 'N'){
-            newLoc = north(searchLocation, map); // call appropriate location grabber function
+            newLoc = north(mate.searchLocation.x, mate.searchLocation.y, map); // call appropriate location grabber function
             // check that the newLoc is water or treasure
             if(newLoc.type == 'o' || newLoc.type == '$'){ 
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'N'; // add the direction travelled to find the location
-                search.push_back(newLoc); // add the location to the first mate dequq
+                mate.search.push_back(newLoc); // add the location to the first mate dequq
                 if(newLoc.type == '$'){ return true;}
             }
         }
 
         else if(curD == 'S'){
-            newLoc = south(searchLocation, map);
+            newLoc = south(mate.searchLocation.x, mate.searchLocation.y, map);
             if(newLoc.type == 'o' || newLoc.type == '$'){
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'S'; // add the direction travelled to find the location
-                search.push_back(newLoc);
+                mate.search.push_back(newLoc);
                 if(newLoc.type == '$'){ return true;}
             }
         }
 
         else if(curD == 'E'){
-            newLoc = east(searchLocation, map);
+            newLoc = east(mate.searchLocation.x, mate.searchLocation.y, map);
             if(newLoc.type == 'o' || newLoc.type == '$'){
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'E'; // add the direction travelled to find the location
-                search.push_back(newLoc);
+                mate.search.push_back(newLoc);
                 if(newLoc.type == '$'){ return true;}
             }
         }
 
         else if(curD == 'W'){
-            newLoc = west(searchLocation, map);
+            newLoc = west(mate.searchLocation.x, mate.searchLocation.y, map);
             if(newLoc.type == 'o' || newLoc.type == '$'){
                 map[newLoc.x][newLoc.y].dis = true; //mark as discovered before adding
                 map[newLoc.x][newLoc.y].dirT = 'W'; // add the direction travelled to find the location
-                search.push_back(newLoc);
+                mate.search.push_back(newLoc);
                 if(newLoc.type == '$'){ return true;}
             }//if
         }//else if
     }
     return found;
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
-void TreasureHunt::cap_search(){
-    std::deque<Location> search;
-    std::deque<Location> searchMate;
-    if(vbose){cout << "Treasure hunt started at: " << startLoc.x << "," << startLoc.y << '\n';}
-    bool foundT = false;
-    // add start locaiton to deque
-    startLoc.dis = true;
-    search.push_back(startLoc);
-
-    // while container not empty
-    while(!search.empty() && !foundT){
-        // set sailLocation to next location
-        // if captain is a queue use front and pop front
-        if(captain == "QUEUE"){
-            sailLocation = search.front();
-            search.pop_front();
-            ++numWaterI;
-        }
-        //if captain is a stack use back and pop back
-        else if(captain == "STACK"){
-            sailLocation = search.back();
-            search.pop_back();
-            ++numWaterI;
-        }
-        // follow hunt order to add new locations
-        foundT = cap_hunt(search, searchMate);
-    }
-    // hunt ended, report outcome
-    if(vbose){
-        if(treasureLoc.type != '$'){cout << "Treasure hunt failed" << '\n';}
-    }
-}
-
-bool TreasureHunt::fm_search(const Location &landLoc, std::deque<Location> &search){
-    //if(vbose){cout << "Searching island... ";}
-    //std::deque<Location> search;
-    bool foundT = false;
-    bool tInHunt = false;
-    search.push_back(landLoc);
-
-    if(landLoc.type == '$'){
-        ++numLandI;
-        foundT = true;
-        treasureLoc = search.back();
+///////////////////////////////////////////
+void TreasureHunt::report(){
+    //verbose called during search
+    backtrace();
+    if(stats){
+        //call print_stats
+        //backtrace();
+        print_stats();
     }
 
-    //check if container is empty
-    while(!search.empty() && !foundT && !tInHunt){
+    if(showP == "M" && treasureLoc.type == 'X'){
+        //backtrace();
+        print_show_pathM();
+    }
 
-        if(firstMate == "QUEUE"){
-            /*if(tInHunt){
-                ++numLandI;
-                foundT = true;
-                treasureLoc = mate.search.front();
-                break;
-            }//if*/
-            searchLocation = search.front();
-            search.pop_front();
-            ++numLandI;
-        }//if
+    if(showP == "L" && treasureLoc.type == 'X'){
+        //backtrace();
+        print_show_pathL();
+    }
 
-        else if(firstMate == "STACK"){
-            //check if back is treasure
-            /*if(tInHunt){
-                treasureLoc = mate.search.back();
-                foundT = true;
-                break;
-            }//if*/
-            searchLocation = search.back();
-            search.pop_back();
-            ++numLandI;
-        }//else if
-
-        tInHunt = fm_hunt(search);
-        if(tInHunt){
-            ++numLandI;
-            foundT = true;
-            treasureLoc = search.back();
-        }
+    if(treasureLoc.type == '$' || treasureLoc.type == 'X'){
+        cout << "Treasure found at " << treasureLoc.x << "," << treasureLoc.y;
+        cout << " with path length " << pathLength << "." << '\n';
+    }
+    if(treasureLoc.type != '$' && treasureLoc.type != 'X'){
+        cout << "No treasure found after investigating " << numLandI+numWaterI;
+        cout << " locations." << '\n';
         
-    }//while
-    return foundT;
-}
+    }
 
-Back opposite_direction(char direction, Location loc){
-    Back prevLoc;
-    if(direction == 'N'){
-        //backwards is south
-        prevLoc.r = loc.x + 1;
-        prevLoc.c = loc.y;
-        //prevLoc.nextDir = 'S';
-    }
-    else if(direction == 'S'){
-        //backwards is N
-        prevLoc.r = loc.x - 1;
-        prevLoc.c = loc.y;
-        //prevLoc.nextDir = 'N';
-    }
-    else if(direction == 'E'){
-        //backwards is  W
-        prevLoc.r = loc.x;
-        prevLoc.c = loc.y - 1;
-        //prevLoc.nextDir = 'W';
-    }
-    else if(direction == 'W'){
-        //backwards is E
-        prevLoc.r = loc.x;
-        prevLoc.c = loc.y + 1;
-        //prevLoc.nextDir = 'E';
-    }
-    return prevLoc;
-}
 
-std::deque<Location> TreasureHunt::backtrace(){
-    std::deque<Location> Path;
+}
+//////////////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////// BACKTRACE ///////////////////////////////
+void TreasureHunt::backtrace(){
     if(treasureLoc.type == '$'){treasureLoc.type = 'X';}
     Location cur = treasureLoc;
     
@@ -366,63 +346,60 @@ std::deque<Location> TreasureHunt::backtrace(){
         cur = next;
         ++pathLength;
     }
-    //Path.push_front(startLoc);
-    return Path;
 }
+////////////////////////////////////////////////////////////////////////////////////////////
 
-void TreasureHunt::report(){
-    //verbose called during search
-    std::deque<Location> path = backtrace();
-    if(stats){
-        //call print_stats
-        //backtrace();
-        print_stats();
+////////////////////////////// OPPOSITE_DIRECTION ///////////////////////////////////////////
+Back opposite_direction(char direction, Location loc){
+    Back prevLoc;
+    if(direction == 'N'){
+        //backwards is south
+        prevLoc.r = loc.x + 1;
+        prevLoc.c = loc.y;
     }
-
-    if(showP == "M" && treasureLoc.type == 'X'){
-        //backtrace();
-        print_show_pathM();
+    else if(direction == 'S'){
+        //backwards is N
+        prevLoc.r = loc.x - 1;
+        prevLoc.c = loc.y;
     }
-
-    if(showP == "L" && treasureLoc.type == 'X'){
-        //backtrace();
-        print_show_pathL(path);
+    else if(direction == 'E'){
+        //backwards is  W
+        prevLoc.r = loc.x;
+        prevLoc.c = loc.y - 1;
     }
-
-    if(treasureLoc.type == '$' || treasureLoc.type == 'X'){
-        cout << "Treasure found at " << treasureLoc.x << "," << treasureLoc.y;
-        cout << " with path length " << pathLength << "." << '\n';
+    else if(direction == 'W'){
+        //backwards is E
+        prevLoc.r = loc.x;
+        prevLoc.c = loc.y + 1;
     }
-    if(treasureLoc.type != '$' && treasureLoc.type != 'X'){
-        cout << "No treasure found after investigating " << numLandI+numWaterI; //fixed
-        cout << " locations." << '\n';
-        
-    }
+    return prevLoc;
 }
+///////////////////////////////////////////////////////////////////////////////
+
 
 void TreasureHunt::print_stats(){
     cout << "--- STATS ---" << '\n';
 
-    cout << "Starting location: " << startLoc.x<< "," << startLoc.y<< '\n';
+    cout << "Starting location: " << startLoc.x<< "," << startLoc.y<<'\n';
     cout << "Water locations investigated: " << numWaterI << '\n';
     cout << "Land locations investigated: " << numLandI << '\n';
     cout << "Went ashore: " << numAshore << '\n';
 
     if(treasureLoc.type == 'X'){
         cout << "Path length: " << pathLength << '\n';
-        cout << "Treasure location: " << treasureLoc.x << "," << treasureLoc.y << '\n';
+        cout << "Treasure location: " << treasureLoc.x << "," << treasureLoc.y <<'\n';
     }
     
     cout << "--- STATS ---" << '\n';
 } 
 
-void TreasureHunt::print_verbose(const Location &hitLand, bool found){
+void TreasureHunt::print_verbose(int hitLandx, int hitLandy, bool found){
 
-    cout << "Went ashore at: " << hitLand.x << "," << hitLand.y << '\n';
+    cout << "Went ashore at: " << hitLandx << "," << hitLandy <<'\n';
     cout << "Searching island... ";
 
     if(found){
-        cout << "party found treasure at " << treasureLoc.x << "," << treasureLoc.y << "." << '\n';
+        cout << "party found treasure at " << treasureLoc.x << "," << treasureLoc.y << "." <<'\n';
     }
     else{
         cout << "party returned with no treasure." << '\n';
@@ -441,15 +418,15 @@ void TreasureHunt::print_show_pathM(){
     
 }
 
-void TreasureHunt::print_show_pathL(std::deque<Location> &Path){
-    cout << "Sail:"<< '\n';
+void TreasureHunt::print_show_pathL(){
+    cout << "Sail:"<<'\n';
     while(Path.front().type == '.' || Path.front().type == '@'){
-       cout << Path.front().x << "," << Path.front().y << '\n';
+       cout << Path.front().x << "," << Path.front().y <<'\n';
        Path.pop_front();
     }
     cout << "Search:" << '\n';
     while(Path.front().type == 'o' || Path.front().type == 'X'){
-       cout << Path.front().x << "," << Path.front().y << '\n';
+       cout << Path.front().x << "," << Path.front().y <<'\n';
        Path.pop_front();
     }
 }

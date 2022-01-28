@@ -21,22 +21,25 @@ struct Back{
     int c = 0;
 };
 
-/*struct Captain{
+struct Captain{
+    std::deque<Location> search;
+
     Location sailLocation;
 
 };
 
 struct FirstMate{
+    std::deque<Location> search;
 
     Location searchLocation;
-};*/
+};
 
-/*struct Stats{
+struct Stats{
     int numWater = 0;
     int numLand = 0;
     int numAshore= 0;
     // path length should be calculated during backtrace
-};*/
+};
 
 
 class TreasureHunt {
@@ -53,53 +56,47 @@ public:
     void cap_search();
 
     //first mate search, returns true if $found
-    bool fm_search(const Location &landLoc, std::deque<Location> &searchMate);
+    bool fm_search(const Location &landLoc);
 
     // captain hunt returns T if $found (calls fm_search when land is hit)
-    bool cap_hunt(std::deque<Location> &search, std::deque<Location> &searchMate);
+    bool cap_hunt();
 
     // fm hunt, breaks when treasure is found
-    bool fm_hunt(std::deque<Location> &search);
+    bool fm_hunt();
 
     //calls the functions for verbose, stats, and show path
     void report();
-    void print_verbose(const Location &hitLand, bool found);
+    void print_verbose(int hitLandx, int hitLandy, bool found);
     void print_show_pathM();
-    void print_show_pathL(std::deque<Location> &path);
+    void print_show_pathL();
     void print_stats();
 
-    std::deque<Location> backtrace();
+    void backtrace();
 
     
 private:
-
     // 2D map with char, dicovered, and search direction    
     std::vector<std::vector<Location>> map;
 
+    //contains the path, need to popfront for printing
+    std::deque<Location> Path;
+     
+    Captain cap;
+    FirstMate mate;
     Location startLoc;
-
     Location treasureLoc;
 
-    Location sailLocation;
-    Location searchLocation;
-    
     // first mate container
     std::string firstMate = "QUEUE";
-    //FirstMate mate;
-
+    
     // captain container type
     std::string captain = "STACK";
-    //Captain cap;
-
+   
     // Order of hunt type
     std::string huntOrder = "NESW";
-    
-    
 
     // contains M or L for output map
     std::string showP = "X";
-
-    
 
     int numLandI = 0;
     int numWaterI = 0;
@@ -109,19 +106,18 @@ private:
     //std::vector<Location> hitLand;
 
     int pathLength = 0;
+
     // made true for verbose and stats output
     bool vbose = false;
     bool stats = false;
-
-    //contains the path, need to popfront for printing
-    //std::deque<Location> Path;
 };
 
 // functions to get the location that is N|S|E|W
 // these return based on a location not being discovered and it being a valid map location
 // other function takes care of chekcing land or water
-Location north(const Location &current, std::vector<std::vector<Location>> &map);
-Location south(const Location &current, std::vector<std::vector<Location>> &map);
-Location east(const Location &current, std::vector<std::vector<Location>> &map);
-Location west(const Location &current, std::vector<std::vector<Location>> &map);
+Location north(int currentx, int currenty, std::vector<std::vector<Location>> &map);
+Location south(int currentx, int currenty, std::vector<std::vector<Location>> &map);
+Location east(int currentx, int currenty, std::vector<std::vector<Location>> &map);
+Location west(int currentx, int currenty, std::vector<std::vector<Location>> &map);
 
+Back opposite_direction(char direction, Location loc);

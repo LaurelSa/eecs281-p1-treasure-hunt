@@ -13,11 +13,11 @@ sdiff out.txt appA.hunt2-vspMcQ.sol.txt
 ./hunt -v -s -pM < spec.map.txt > sm.txt
 sdiff sm.txt spec.vspM.sol.txt
 
-./hunt -v -s -pM < spec.lst.txt > sl.txt
+./hunt -v -s -pM < spec.lst.txt > sm.txt
 sdiff sm.txt spec.vspM.sol.txt
 
 ./hunt -v -s -pL < spec.lst.txt > sl.txt
-sdiff sm.txt spec.vspL.sol.txt
+sdiff sl.txt spec.vspL.sol.txt
 
 ./hunt -v -s -p M -c QUEUE -f QUEUE -o SWNE < test-2-v-s-pM-cQUEUE-fQUEUE-oSWNE.txt > test2.out
 sdiff test2.out test2.sol.txt
