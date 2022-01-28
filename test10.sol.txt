@@ -1,0 +1,17 @@
+Treasure hunt started at: 0,0
+Went ashore at: 1,0
+Searching island... party found treasure at 1,1.
+--- STATS ---
+Starting location: 0,0
+Water locations investigated: 1
+Land locations investigated: 2
+Went ashore: 1
+Path length: 2
+Treasure location: 1,1
+--- STATS ---
+Sail:
+0,0
+Search:
+1,0
+1,1
+Treasure found at 1,1 with path length 2.

@@ -1,0 +1,21 @@
+Treasure hunt started at: 0,2
+Went ashore at: 2,2
+Searching island... party returned with no treasure.
+Went ashore at: 6,3
+Searching island... party found treasure at 6,2.
+--- STATS ---
+Starting location: 0,2
+Water locations investigated: 13
+Land locations investigated: 5
+Went ashore: 2
+Path length: 12
+Treasure location: 6,2
+--- STATS ---
+##@##o.
++-+.#o.
+|ooo#..
++--+#o.
+##.|#o.
+..#|...
+ooX+...
+Treasure found at 6,2 with path length 12.

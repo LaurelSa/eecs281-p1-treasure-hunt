@@ -1,0 +1,59 @@
+./hunt -v -s -p L -c STACK -f STACK -o SWNE < test-1-v-s-pL-cSTACK-fSTACK-oSWNE.txt > test-1.out
+sdiff test-1.out test-1.sol.txt
+
+./hunt -p L -o SWEN < appA.map.txt > out.txt
+sdiff out.txt appA.hunt4-pLoSWEN.sol.txt
+
+./hunt -v --stats -p M -f STACK < appA.map.txt > out.txt
+sdiff out.txt appA.hunt3-vspMfS.sol.txt
+
+./hunt -v --stats -p M -c QUEUE < appA.map.txt > out.txt
+sdiff out.txt appA.hunt2-vspMcQ.sol.txt
+
+./hunt -v -s -pM < spec.map.txt > sm.txt
+sdiff sm.txt spec.vspM.sol.txt
+
+./hunt -v -s -pM < spec.lst.txt > sl.txt
+sdiff sm.txt spec.vspM.sol.txt
+
+./hunt -v -s -pL < spec.lst.txt > sl.txt
+sdiff sm.txt spec.vspL.sol.txt
+
+./hunt -v -s -p M -c QUEUE -f QUEUE -o SWNE < test-2-v-s-pM-cQUEUE-fQUEUE-oSWNE.txt > test2.out
+sdiff test2.out test2.sol.txt
+
+./hunt -v -s -p M -c STACK -f STACK -o SWNE < test-1-v-s-pL-cSTACK-fSTACK-oSWNE.txt > test1.out
+sdiff test1.out test1.sol.txt
+
+./hunt -v -s -p M -c QUEUE -f QUEUE -o SWNE < test-3-v-s-pM-cQUEUE-fQUEUE-oSWNE.txt > test3.out
+sdiff test3.out test3.sol.txt
+
+./hunt -v -s -p L < test-4-v-s-pL.txt > test4.out
+sdiff test4.out test4.sol.txt
+
+./hunt -v -s -p L < test-5-v-s-pL.txt > test5.out
+sdiff test5.out test5.sol.txt
+
+./hunt -v -s -p M -o ENWS < test-6-v-s-pM-oENWS.txt > test6.out
+sdiff test6.out test6.sol.txt
+
+./hunt -v -s -p L -o SNWE < test-7-v-s-pL-oSNWE.txt > test7.out
+sdiff test7.out test7.sol.txt
+
+./hunt -v -s -p M -c QUEUE -f STACK < test-8-vspMcQUEUEfSTACK.txt > test8.out
+sdiff test8.out test8.sol.txt
+
+./hunt -v -s -p M -o ESWN < test-9-vspMoESWN.txt > test9.out
+sdiff test9.out test9.sol.txt
+
+./hunt -v -s -p L < test-10-vspL.txt > test10.out
+sdiff test10.out test10.sol.txt
+
+./hunt -v -s -p M -c QUEUE < test-12-v-s-pM-cQUEUE.txt > test12.out
+sdiff test12.out test12.sol.txt
+
+./hunt -v -s -p L -f STACK < test-13-vspLfSTACK.txt > test13.out
+sdiff test13.out test13.sol.txt
+
+./hunt -v -s -p M -f STACK < test-14-vspMfSTACK.txt > test14.out
+sdiff test14.out test14.sol.txt

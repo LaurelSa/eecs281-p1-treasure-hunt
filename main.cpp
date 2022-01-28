@@ -23,9 +23,7 @@ int main(int argc, char ** argv){
     myHunt.cap_search();
 
     myHunt.report();
-
-
-
+    return 0;
 }//main
 
 void print_help(){
@@ -37,7 +35,7 @@ void print_help(){
          <<                 "\t[--stats | -s]\n" 
          <<                 "\t[--show-path| -p] <M | L>\n" 
          <<                 "\t[--help | -h]\n" 
-         <<endl;
+         <<'\n';
 }
 
 
@@ -70,7 +68,7 @@ void TreasureHunt::get_options(int argc, char** argv){
                 captain = "STACK";
             }
             else if(captain != "STACK" && captain != "QUEUE"){
-                cerr << "Invalid argument to --captain" << endl;  // personal debug
+                cerr << "Invalid argument to --captain" << '\n';  // personal debug
                 exit(1);
             }
             break;
@@ -81,7 +79,7 @@ void TreasureHunt::get_options(int argc, char** argv){
                 firstMate = "QUEUE";
             }
             else if(firstMate != "STACK" && firstMate != "QUEUE"){
-                cerr << "Invalid argument to --first-mate" << endl;  // personal debug
+                cerr << "Invalid argument to --first-mate" << '\n';  // personal debug
                 exit(1);
             }
             break;
@@ -92,7 +90,7 @@ void TreasureHunt::get_options(int argc, char** argv){
                 huntOrder = "NESW";
             }
             else if(huntOrder.length() != 4){
-                cerr << "Invalid argument to --hunt-order" << endl;  // personal debug
+                cerr << "Invalid argument to --hunt-order" << '\n';  // personal debug
                 exit(1);
             }
             else{
@@ -100,8 +98,8 @@ void TreasureHunt::get_options(int argc, char** argv){
                 long int numS = count(huntOrder.begin(), huntOrder.end(), 'S');
                 long int numE = count(huntOrder.begin(), huntOrder.end(), 'E');
                 long int numW = count(huntOrder.begin(), huntOrder.end(), 'W');
-                if(numN > 1 || numS > 1 || numE > 1 || numW >1){
-                    cerr << "Invalid argument to --hunt-order" << endl;  // personal debug
+                if(numN != 1 || numS != 1 || numE != 1 || numW != 1){
+                    cerr << "Invalid argument to --hunt-order" << '\n';  // personal debug
                     exit(1);
                 }
             }
@@ -116,21 +114,21 @@ void TreasureHunt::get_options(int argc, char** argv){
             break;
 
         case 'p':
-            if(showP == 'M' || showP == 'L'){
-                cerr << "Specify --show-path only once" << endl;  // personal debug
+            if(showP == "M" || showP == "L"){
+                cerr << "Specify --show-path only once" << '\n';  // personal debug
                 exit(1);
             }
-            showP = *optarg;
-            if(showP != 'M' && showP != 'L'){
+            showP = optarg;
+            if(showP != "M" && showP != "L"){
                 //cout << showP;
-                cerr << "Invalid argument to --show-path" << endl;  // personal debug
+                cerr << "Invalid argument to --show-path" << '\n';  // personal debug
                 
                 exit(1);
             }
             break;
 
         default:
-            cerr << "Unknown option" << endl;  // personal debug
+            cerr << "Unknown option" << '\n';  // personal debug
                 exit(1);
         }//switch
 

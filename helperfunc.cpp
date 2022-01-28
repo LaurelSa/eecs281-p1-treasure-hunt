@@ -12,12 +12,12 @@
 using namespace std;
 
 
-Location north(Location &current, vector<vector<Location>> &map){
-    int tempR;
+Location north(const Location &current, vector<vector<Location>> &map){
+    //int tempR;
     Location newLoc;
     newLoc.type = '#';
     if(current.x - 1 >= 0){
-        tempR = current.x - 1;
+        int tempR = current.x - 1;
         Location validLoc = map[tempR][current.y];
         validLoc.dirT = 'N';
         if(!validLoc.dis){return validLoc;}
@@ -25,7 +25,7 @@ Location north(Location &current, vector<vector<Location>> &map){
     return newLoc;
 }//north
 
-Location south(Location &current, vector<vector<Location>> &map){
+Location south(const Location &current, vector<vector<Location>> &map){
     //row +1
     Location tempLoc;
     tempLoc.type = '#';
@@ -39,7 +39,7 @@ Location south(Location &current, vector<vector<Location>> &map){
     return tempLoc;
 }//south
 
-Location east(Location &current, vector<vector<Location>> &map){
+Location east(const Location &current, vector<vector<Location>> &map){
     //col +1
     Location tempLoc;
     tempLoc.type = '#'; // initialize it as invalid
@@ -54,7 +54,7 @@ Location east(Location &current, vector<vector<Location>> &map){
     return tempLoc;
 }//east
 
-Location west(Location &current, vector<vector<Location>> &map){
+Location west(const Location &current, vector<vector<Location>> &map){
     Location tempLoc;
     tempLoc.type ='#';
     if(current.y - 1 >= 0 ){
